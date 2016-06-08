@@ -26,12 +26,20 @@ public class EventModel {
 
     public List<Event> getEventFromEventID(int id) {
         boolean found = false;
-        for (int i=0;i<this.eventList.size() && !found; ++i){
+        //if id is 0, it means that this is the start game event
+        if (id==0){
+            return this.eventList;
+        }
+        for (int i=0;i<this.eventList.size() && !found ; ++i){
             if (this.eventList.get(i).getId()==id){
                 found = true;          
             }
-        }  
-        return this.eventList.subList(id+1, this.eventList.size()); 
+        }   if (found){
+            return this.eventList.subList(id, this.eventList.size()); 
+        } else {
+            return null;
+        }
+        
     }
 
     public void addEvent(Event newEvent) {
