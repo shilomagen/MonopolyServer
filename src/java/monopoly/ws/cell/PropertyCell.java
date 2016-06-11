@@ -2,6 +2,7 @@ package monopoly.ws.cell;
 
 import monopoly.ws.data.City;
 import monopoly.ws.player.Player;
+import static monopoly.ws.utility.EventTypes.ON_CITY;
 
 
 public class PropertyCell extends Cell implements Buyable {
@@ -69,5 +70,11 @@ public class PropertyCell extends Cell implements Buyable {
 //				+ "Stay Cost: " +  this.data.getStayCost() +"\nStay Cost 1"+ this.data.getStayCost1() +"\nStay Cost 2"+ this.data.getStayCost2()
 //				+ "\nStay Cost 3"+ this.data.getStayCost3();
 //	}
+
+    @Override
+    public void playAction(Player currentPlayer) {
+        currentPlayer.getGame().addEventToEngine(ON_CITY);
+    }
+        
 
 }

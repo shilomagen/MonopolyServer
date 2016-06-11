@@ -5,6 +5,7 @@ import monopoly.ws.data.Card;
 import monopoly.ws.data.City;
 import monopoly.ws.data.Transportation;
 import monopoly.ws.data.Utility;
+import monopoly.ws.game.MonopolyGame;
 import ws.monopoly.PlayerDetails;
 
 
@@ -40,4 +41,6 @@ public interface Player {
 	public String getPaidPlayerName();
 	public void releasePlayerAssets();
         public PlayerDetails getPlayerDetails();
+        public MonopolyGame getGame();
+        public void setGame(MonopolyGame playerGame);
 }

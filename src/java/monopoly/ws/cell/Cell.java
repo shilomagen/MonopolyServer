@@ -1,5 +1,7 @@
 package monopoly.ws.cell;
 
+import monopoly.ws.player.Player;
+
 public abstract class Cell {
 	private final String name;
 	private final int position;
@@ -16,6 +18,8 @@ public abstract class Cell {
 	public int getPosition() {
 		return position;
 	}
+        
+        public abstract void playAction(Player currentPlayer);
 
 
 }

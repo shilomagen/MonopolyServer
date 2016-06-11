@@ -13,12 +13,12 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import monopoly.ws.game.MonopolyGame;
 import javax.jws.WebService;
 import monopoly.ws.game.GameManager;
 import monopoly.ws.player.Player;
+import monopoly.ws.utility.EventTypes;
+import static monopoly.ws.utility.EventTypes.PLAYER_RESIGN;
 import monopoly.ws.utility.GameConstants;
 import ws.monopoly.Event;
 import ws.monopoly.EventType;
@@ -35,10 +35,13 @@ public class monopolyWS {
 
     private GameManager gameManager;
     private static int playerID = 0;
+    
 
     //ctor
     public monopolyWS() {
         this.gameManager = new GameManager();
+        
+        
     }
 
     /**
@@ -79,8 +82,8 @@ public class monopolyWS {
     }
 
     public void resign(int playerId) throws ws.monopoly.InvalidParameters_Exception {
-        //TODO implement this method
-        throw new UnsupportedOperationException("Not implemented yet.");
+        Player player = this.gameManager.getPlayerById(playerId);
+        player.getGame().addEventToEngine(PLAYER_RESIGN);
     }
 
     public int joinGame(java.lang.String gameName, java.lang.String playerName) throws ws.monopoly.InvalidParameters_Exception, ws.monopoly.GameDoesNotExists_Exception {
@@ -110,8 +113,22 @@ public class monopolyWS {
     }
 
     public void buy(int arg0, int arg1, boolean arg2) throws ws.monopoly.InvalidParameters_Exception {
-        //TODO implement this method
-        throw new UnsupportedOperationException("Not implemented yet.");
+        Player player = this.gameManager.getPlayerById(arg0);
+        Event event = player.getGame().getEventManager().getEventById(arg1);
+        
+        if (arg2){
+            if (event.getType()==EventType.PROPMPT_PLAYER_TO_BY_HOUSE){
+                player.getGame().addEventToEngine(EventTypes.PLAYER_WANTS_TO_BUY_HOUSE);
+            }else {
+                player.getGame().addEventToEngine(EventTypes.PLAYER_WANTS_TO_BUY_BUYABLE);
+            }
+        } else{
+            player.getGame().addEventToEngine(EventTypes.PLAYER_DIDNT_WANT_TO_BUY);
+        }
+        
+        
+        
+        
     }
 
     private boolean goodParamaters(int computerizedPlayers, int humanPlayers) throws InvalidParameters_Exception {
@@ -127,8 +144,11 @@ public class monopolyWS {
 
     private void launchGame(String gameName) {
         try {
-            MonopolyGame game = this.gameManager.getGameByGameName(gameName);       
-            game.getEventManager().addEvent(EventType.GAME_START);
+            MonopolyGame game = this.gameManager.getGameByGameName(gameName);
+            Event startEvent = new Event();
+            startEvent.setType(EventType.GAME_START);
+            game.getEventManager().addEvent(startEvent);
+            game.startRollingTheGame();
         } catch (GameDoesNotExists_Exception ex) {
             System.out.println("error launching the game!");
         }

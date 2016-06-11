@@ -5,8 +5,8 @@ import monopoly.ws.data.Card;
 import monopoly.ws.data.City;
 import monopoly.ws.data.Transportation;
 import monopoly.ws.data.Utility;
+import monopoly.ws.game.MonopolyGame;
 import monopoly.ws.utility.GameConstants;
-import ws.monopoly.GameDetails;
 import ws.monopoly.PlayerDetails;
 import ws.monopoly.PlayerStatus;
 import ws.monopoly.PlayerType;
@@ -27,6 +27,7 @@ public class PcPlayer implements Player {
     private int lastFine;
     private Player paidTo;
     private PlayerDetails playerDetails;
+    private MonopolyGame playerGame;
     
     public PcPlayer(PlayerData data) {
         this.data = data;
@@ -210,6 +211,22 @@ public class PcPlayer implements Player {
     @Override
     public PlayerDetails getPlayerDetails() {
         return this.playerDetails;
+    }
+
+    /**
+     * @return the playerGame
+     */
+    @Override
+    public MonopolyGame getGame() {
+        return playerGame;
+    }
+
+    /**
+     * @param playerGame the playerGame to set
+     */
+    @Override
+    public void setGame(MonopolyGame playerGame) {
+        this.playerGame = playerGame;
     }
     
 }

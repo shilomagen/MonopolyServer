@@ -2,6 +2,7 @@ package monopoly.ws.cell;
 
 import monopoly.ws.data.Utility;
 import monopoly.ws.player.Player;
+import static monopoly.ws.utility.EventTypes.ON_UTILITY;
 
 
 
@@ -47,4 +48,9 @@ public class UtilityCell extends Cell implements Buyable{
 	public boolean isHasOwner() {
 		return this.hasOwner;
 	}
+
+    @Override
+    public void playAction(Player currentPlayer) {
+        currentPlayer.getGame().addEventToEngine(ON_UTILITY);
+    }
 }

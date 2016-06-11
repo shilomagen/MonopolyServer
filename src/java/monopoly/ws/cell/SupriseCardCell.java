@@ -1,6 +1,8 @@
 package monopoly.ws.cell;
 
 import monopoly.ws.data.Card;
+import monopoly.ws.player.Player;
+import static monopoly.ws.utility.CellTypes.ON_SURPRISE;
 
 
 public class SupriseCardCell extends Cell{
@@ -10,11 +12,11 @@ public class SupriseCardCell extends Cell{
 		this.data = null;
 	}
 
-//	@Override
-//	public void playAction(Player currentPlayer) {
-//		GameController.surpriseCardProcedure(this.data, currentPlayer);
-//		
-//	}
+	@Override
+	public void playAction(Player currentPlayer) {
+		currentPlayer.getGame().addEventToEngine(ON_SURPRISE);
+		
+	}
 	
 	
 }

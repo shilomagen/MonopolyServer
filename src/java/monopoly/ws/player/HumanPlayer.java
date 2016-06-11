@@ -5,6 +5,7 @@ import monopoly.ws.data.Card;
 import monopoly.ws.data.City;
 import monopoly.ws.data.Transportation;
 import monopoly.ws.data.Utility;
+import monopoly.ws.game.MonopolyGame;
 import monopoly.ws.utility.GameConstants;
 import ws.monopoly.PlayerDetails;
 import ws.monopoly.PlayerStatus;
@@ -26,6 +27,7 @@ public class HumanPlayer implements Player {
     private int lastFine;
     private Player paidTo;
     private PlayerDetails playerDetails;
+    private MonopolyGame playerGame;
 
     public HumanPlayer(PlayerData data) {
         this.data = data;
@@ -108,22 +110,22 @@ public class HumanPlayer implements Player {
     public void setMoney(int money) {
         this.money = money;
         this.playerDetails.setMoney(this.money);
-        
+
     }
-    
+
     @Override
     public int getMoney() {
         return money;
     }
-    
+
     @Override
     public void setIsBankrupt(boolean b) {
-        
+
         this.bankrupt = b;
         if (b) {
             this.playerDetails.setStatus(PlayerStatus.RETIRED);
         }
-        
+
     }
 
     public boolean isHasFreeJailCard() {
@@ -201,10 +203,25 @@ public class HumanPlayer implements Player {
         this.playerDetails.setStatus(PlayerStatus.JOINED);
         this.playerDetails.setType(PlayerType.HUMAN);
     }
-    
+
     @Override
     public PlayerDetails getPlayerDetails() {
         return this.playerDetails;
+    }
+
+    /**
+     * @return the playerGame
+     */
+    public MonopolyGame getGame() {
+        return playerGame;
+    }
+
+    /**
+     * @param playerGame the playerGame to set
+     */
+    @Override
+    public void setGame(MonopolyGame playerGame) {
+        this.playerGame = playerGame;
     }
 
 }

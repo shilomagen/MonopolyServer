@@ -2,6 +2,7 @@ package monopoly.ws.cell;
 
 import monopoly.ws.data.Transportation;
 import monopoly.ws.player.Player;
+import static monopoly.ws.utility.EventTypes.ON_TRANSPORTATION;
 
 
 
@@ -45,6 +46,11 @@ public class TransportationCell extends Cell implements Buyable{
 	public boolean isHasOwner() {
 		return this.hasOwner;
 	}
+
+    @Override
+    public void playAction(Player currentPlayer) {
+        currentPlayer.getGame().addEventToEngine(ON_TRANSPORTATION);
+    }
 	
 	
 	

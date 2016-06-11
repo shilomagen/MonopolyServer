@@ -1,19 +1,20 @@
 package monopoly.ws.data;
 
 public class CellData {
-	private String type;
-	
 
-	public CellData(String type){
-		this.type = type;
-	}
+    private String type;
 
-	public String getType() {
-		return this.type;
-	}
+    public CellData(String type) {
+        this.type = type;
 
-	public void setType(String type) {
-		this.type = type;
-	}
-	
+    }
+
+    public String getType() {
+        return this.type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
 }

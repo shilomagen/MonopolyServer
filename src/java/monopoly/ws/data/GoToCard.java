@@ -1,5 +1,6 @@
 package monopoly.ws.data;
 
+import monopoly.ws.game.MonopolyGame;
 import monopoly.ws.player.Player;
 import monopoly.ws.utility.EventTypes;
 
@@ -15,26 +16,28 @@ public class GoToCard extends Card {
 
 	@Override
 	public void surpriseAction(Player currentPlayer) {
+            MonopolyGame game = currentPlayer.getGame();
 		if (this.cellToGo.equals("START")) {
-//			GameEngine.addEventToEngine(EventTypes.RETURN_CARD_TO_SURPRISE_DECK);
-//			GameEngine.addEventToEngine(EventTypes.GO_TO_START_CELL);
+			game.addEventToEngine(EventTypes.RETURN_CARD_TO_SURPRISE_DECK);
+			game.addEventToEngine(EventTypes.GO_TO_START_CELL);
 
 		} else if (this.cellToGo.equals("NEXT_SURPRISE")) {
-//			GameEngine.addEventToEngine(EventTypes.RETURN_CARD_TO_SURPRISE_DECK);
-//			GameEngine.addEventToEngine(EventTypes.GO_TO_NEXT_SURPRISE);
+			game.addEventToEngine(EventTypes.RETURN_CARD_TO_SURPRISE_DECK);
+			game.addEventToEngine(EventTypes.GO_TO_NEXT_SURPRISE);
 
 		}
 	}
 
 	@Override
 	public void warrantAction(Player currentPlayer) {
+            MonopolyGame game = currentPlayer.getGame();
 		if (this.cellToGo.equals("JAIL")) {
-//			GameEngine.addEventToEngine(EventTypes.RETURN_CARD_TO_WARRANT_DECK);
-//			GameEngine.addEventToEngine(EventTypes.ON_GO_TO_JAIL);
+			game.addEventToEngine(EventTypes.RETURN_CARD_TO_WARRANT_DECK);
+			game.addEventToEngine(EventTypes.ON_GO_TO_JAIL);
 
 		} else if (this.cellToGo.equals("NEXT_WARRANT")) {
-//			GameEngine.addEventToEngine(EventTypes.RETURN_CARD_TO_WARRANT_DECK);
-//			GameEngine.addEventToEngine(EventTypes.GO_TO_NEXT_WARRANT);
+			game.addEventToEngine(EventTypes.RETURN_CARD_TO_WARRANT_DECK);
+			game.addEventToEngine(EventTypes.GO_TO_NEXT_WARRANT);
 			
 
 		}

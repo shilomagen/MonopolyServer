@@ -7,7 +7,8 @@ package monopoly.ws.events;
 
 import java.util.List;
 import ws.monopoly.Event;
-import ws.monopoly.EventType;
+import ws.monopoly.InvalidParameters;
+import ws.monopoly.InvalidParameters_Exception;
 
 /**
  *
@@ -25,21 +26,22 @@ public class EventManager {
         return this.eventModel.getEventFromEventID(id);
     }
 
-    public void addEvent(EventType eventType) {
-        Event eventToAdd = new Event();
-        eventToAdd.setType(eventType);
-        eventToAdd.setId(eventID);
+    public void addEvent(Event event) {
+        event.setId(eventID);
         incrementEventID();
-        switch (eventType){
-            case GAME_START:
-                this.eventModel.addEvent(eventToAdd);
-                break;
-            default:
-                break;
-        }
+        this.eventModel.addEvent(event);
     }
 
     private void incrementEventID() {
         eventID++;
+    }
+
+    public Event getEventById(int arg1) throws InvalidParameters_Exception {
+        for (Event event : this.eventModel.getEventList()){
+            if (event.getId()==arg1){
+                return event;
+            }
+        }
+        throw new InvalidParameters_Exception("There is no event with ID: " + arg1, new InvalidParameters());
     }
 }

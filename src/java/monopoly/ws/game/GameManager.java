@@ -68,13 +68,13 @@ public class GameManager {
         return game.getGameDetails();
     }
 
-    public Player getPlayerById(int playerId) throws GameDoesNotExists_Exception {
+    public Player getPlayerById(int playerId) throws InvalidParameters_Exception {
         for (MonopolyGame game : this.gameModel.getGameModel()){
              Player player = game.getPlayerById(playerId);
              if (player != null)
                  return player;
         }
-        throw new GameDoesNotExists_Exception("Player ID: " + playerId + " is not in game!", new GameDoesNotExists());
+        throw new InvalidParameters_Exception("Player ID: " + playerId + " is not in game!", new InvalidParameters());
            
         
     }
