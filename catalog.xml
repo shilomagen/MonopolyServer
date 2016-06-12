@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<catalog xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog" prefer="system">
-    <system systemId="file:/Users/ShiloMangam/Downloads/WSDL%201.1/MonopolyWebServiceService.wsdl" uri="src/conf/xml-resources/web-services/monopolyWS/wsdl/MonopolyWebServiceService.wsdl"/>
-    <system systemId="file:/Users/ShiloMangam/Downloads/WSDL%201.1/MonopolyWebServiceService_schema1.xsd" uri="src/conf/xml-resources/web-services/monopolyWS/wsdl/MonopolyWebServiceService_schema1.xsd"/>
-    <system systemId="file:/Users/ShiloMangam/Documents/workspace/MonopolyServer/src/java/monopoly/ws/resources/monopoly_config.xsd" uri="src/conf/xml-resources/jaxb/GameScheme/monopoly_config.xsd"/>
-</catalog>
