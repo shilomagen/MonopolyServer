@@ -2,7 +2,8 @@ package monopoly.ws.cell;
 
 import monopoly.ws.data.Card;
 import monopoly.ws.player.Player;
-import static monopoly.ws.utility.CellTypes.ON_SURPRISE;
+import static monopoly.ws.utility.EventTypes.ON_SUPRISE;
+
 
 
 public class SupriseCardCell extends Cell{
@@ -14,7 +15,7 @@ public class SupriseCardCell extends Cell{
 
 	@Override
 	public void playAction(Player currentPlayer) {
-		currentPlayer.getGame().addEventToEngine(ON_SURPRISE);
+		currentPlayer.getGame().addEventToEngine(ON_SUPRISE);
 		
 	}
 	
