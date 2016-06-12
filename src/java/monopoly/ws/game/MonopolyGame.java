@@ -65,6 +65,7 @@ public class MonopolyGame {
         this.gameEngine.setInitiator(this.initiator);
         this.gameEngine.setDecks();
         this.gameEngine.setEventManager(this.eventManager);
+        
 
     }
 
@@ -136,6 +137,8 @@ public class MonopolyGame {
     }
 
     public void startRollingTheGame() {
+        this.gameEngine.setPlayerManager(this.playersManager);
+        this.gameEngine.startObserv();
         this.gameEngine.addEventToInternal(EventTypes.PLAY_TURN);
 
     }
@@ -160,6 +163,10 @@ public class MonopolyGame {
      */
     public void setGameBoard(GameBoard gameBoard) {
         this.gameBoard = gameBoard;
+    }
+
+    void shutdownGame() {
+        this.gameDetails.setStatus(GameStatus.FINISHED);
     }
 
 }

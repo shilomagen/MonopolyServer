@@ -7,6 +7,9 @@ package monopoly.ws.game;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.Timer;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
@@ -43,9 +46,11 @@ import static monopoly.ws.utility.EventMessages.PLAYER_RETIRED_MESSAGE;
 import static monopoly.ws.utility.EventMessages.ROLL_MESSAGE;
 import static monopoly.ws.utility.EventMessages.TAKE_MONEY_FROM_JACKPOT_MESSAGE;
 import static monopoly.ws.utility.EventMessages.WINNER_MESSAGE;
+import monopoly.ws.utility.EventTimer;
 import monopoly.ws.utility.EventTypes;
 import static monopoly.ws.utility.EventTypes.PLAYER_WANTS_TO_USE_CARD;
 import monopoly.ws.utility.GameConstants;
+import static monopoly.ws.utility.GameConstants.TIME_OUT;
 import static monopoly.ws.utility.GameConstants.TOTAL_CELL;
 import monopoly.ws.utility.PairOfDice;
 import ws.monopoly.Event;
@@ -68,30 +73,33 @@ public class GameEngine {
     private LinkedList<Card> warrantDeck;
     private Card currentCard;
     private EventManager eventManager;
+    private EventTimer eventTimer;
+    private Timer timer;
+    private ExecutorService taskExecutor;
 
     public GameEngine(MonopolyGame _game) {
         this.game = _game;
         this.internalEventList = FXCollections.observableArrayList();
         this.cellModel = this.game.getGameBoard().getCellModel();
+        this.timer = new Timer();
+
+        taskExecutor = Executors.newFixedThreadPool(3);
 
     }
 
     public void startObserv() {
         this.internalEventList = FXCollections.observableArrayList();
         internalEventList.addListener(new ListChangeListener<InternalEvent>() {
-
             @Override
             public void onChanged(ListChangeListener.Change c) {
-
                 while (c.next()) {
                     if (c.wasAdded()) {
                         InternalEvent event = internalEventList.get(internalEventList.size() - 1);
-                        System.out.println(event);
+                        System.out.println(event.getType());
                         eventHandler(event);
                     }
                 }
             }
-
         });
 
     }
@@ -109,9 +117,9 @@ public class GameEngine {
                     winnerEvent = this.eventInitiator(0, WINNER_MESSAGE, winnerPlayerName,
                             0, 0, false, 0, false, null, 0, EventType.GAME_WINNER, 0);
                     this.eventManager.addEvent(winnerEvent);
-                }
-
-                if (!currentPlayer.isBankrupt()) {
+                    this.game.shutdownGame();
+                    
+                } else if (!currentPlayer.isBankruptOrRetired()) {
                     if (currentPlayer.isParked()) {
                         Event parkedEvent;
                         parkedEvent = this.eventInitiator(this.currentPlayer.getPosition(), PARKED_MESSAGE, this.currentPlayer.getPlayerName(), 0,
@@ -125,11 +133,15 @@ public class GameEngine {
                 } else {
                     internalEventList.add(new InternalEvent(EventTypes.TURN_FINISHED));
                 }
-                break;
-            case EventTypes.TURN_FINISHED:
-                this.playerManager.nextPlayer();
 
                 break;
+            case EventTypes.TURN_FINISHED: {
+                this.taskExecutor.execute(() -> {
+                    this.playerManager.nextPlayer();
+                });
+                break;
+            }
+
             case EventTypes.ROLL_DICE:
                 PairOfDice.roll();
                 int firstDie = PairOfDice.getFirstDice();
@@ -290,7 +302,7 @@ public class GameEngine {
             }
             case EventTypes.PLAYER_LOST_GAME:
                 for (Player player : playerManager.getPlayers()) {
-                    if (player.isBankrupt()) {
+                    if (player.isBankruptOrRetired()) {
                         player.releasePlayerAssets();
                         Event playerLostEvent;
                         playerLostEvent = this.eventInitiator(0, PLAYER_LOST_MESSAGE, this.currentPlayer.getPlayerName(), 0, 0, false,
@@ -310,7 +322,9 @@ public class GameEngine {
                 this.internalEventList.add(new InternalEvent(EventTypes.TURN_FINISHED));
                 break;
             }
-
+            case EventTypes.START_TIMER:
+                this.timer.schedule(new EventTimer(this), TIME_OUT * 1000);
+                break;
             case EventTypes.PLAYER_WANTS_TO_BUY_BUYABLE: {
                 Buyable cell = (Buyable) cellModel.getCells().get(currentPlayer.getPosition());
                 currentPlayer.setMoney(currentPlayer.getMoney() - cell.getCost());
@@ -341,7 +355,6 @@ public class GameEngine {
             }
             case EventTypes.TAKE_MONEY_FROM_ALL_PLAYERS: {
                 this.takeMoneyFromPlayers(currentPlayer, ((MontaryCard) this.currentCard).getSum());
-                internalEventList.add(new InternalEvent(EventTypes.TURN_FINISHED));
                 break;
             }
             case EventTypes.TAKE_MONEY_FROM_JACKPOT: {
@@ -351,7 +364,6 @@ public class GameEngine {
                 takeMoneyFromJackpot = this.eventInitiator(0, TAKE_MONEY_FROM_JACKPOT_MESSAGE, this.currentPlayer.getPlayerName(), 0, 0, false,
                         0, false, null, sum, EventType.PAYMENT, 0);
                 this.eventManager.addEvent(takeMoneyFromJackpot);
-                internalEventList.add(new InternalEvent(EventTypes.TURN_FINISHED));
                 break;
             }
             case EventTypes.GO_TO_START_CELL: {
@@ -360,7 +372,11 @@ public class GameEngine {
                         GameConstants.BASE_CELL, false, null, 0, EventType.MOVE, 0);
                 this.eventManager.addEvent(goToStart);
                 this.currentPlayer.setPosition(GameConstants.BASE_CELL);
-                this.cellModel.getCells().get(GameConstants.BASE_CELL).playAction(this.currentPlayer);
+                currentPlayer.setMoney(currentPlayer.getMoney() + 400);
+                Event startLand;
+                startLand = this.eventInitiator(0, LANDED_START_SQUARE_MESSAGE, this.currentPlayer.getPlayerName(), 0, 0, false,
+                        0, false, null, 0, EventType.LANDED_ON_START_SQUARE, 0);
+                this.eventManager.addEvent(startLand);
                 break;
             }
             case EventTypes.GO_TO_NEXT_SURPRISE: {
@@ -368,9 +384,14 @@ public class GameEngine {
                 this.setPlayerNewLocation(currentPlayer, "NEXT_SURPRISE");
                 if (lastLocation > currentPlayer.getPosition()) {
                     this.internalEventList.add(new InternalEvent(EventTypes.PASSED_START_CELL));
-                    currentPlayer.setMoney(currentPlayer.getMoney() + 200);
+
                 }
-                this.cellModel.getCells().get(currentPlayer.getPosition()).playAction(this.currentPlayer);
+                this.currentCard = this.getSurpriseCard();
+                Event secondSurpriseEvent;
+                secondSurpriseEvent = this.eventInitiator(0, this.currentCard.toString(), this.currentPlayer.getPlayerName(), 0, 0, false,
+                        0, false, null, 0, EventType.SURPRISE_CARD, 0);
+                this.eventManager.addEvent(secondSurpriseEvent);
+                this.currentCard.surpriseAction(this.currentPlayer);
                 break;
             }
             case EventTypes.GET_OUT_OF_JAIL_CARD: {
@@ -380,7 +401,6 @@ public class GameEngine {
                 this.eventManager.addEvent(getOutOfJailCard);
                 currentPlayer.setHasFreeJailCard(true);
                 currentPlayer.setJailFreeCard(this.currentCard);
-                internalEventList.add(new InternalEvent(EventTypes.TURN_FINISHED));
                 break;
             }
 
@@ -388,6 +408,10 @@ public class GameEngine {
                 this.returnToWarrantDeck();
                 break;
             }
+            case EventTypes.KILL_TIMER:
+                this.timer.cancel();
+                this.eventTimer.cancel();
+                break;
             case EventTypes.RETURN_CARD_TO_SURPRISE_DECK: {
                 this.returnSurpriseCardToDeck();
                 break;
@@ -411,7 +435,7 @@ public class GameEngine {
                 } else {
                     this.payFineToEveryPlayer(currentPlayer, sum);
                 }
-                internalEventList.add(new InternalEvent(EventTypes.TURN_FINISHED));
+
                 break;
             }
             case EventTypes.PAY_TO_JACKPOT: {
@@ -456,7 +480,8 @@ public class GameEngine {
             promptHouseEvent = this.eventInitiator(0, infoString, this.currentPlayer.getPlayerName(), 0, 0, false,
                     0, false, null, 0, EventType.PROPMPT_PLAYER_TO_BY_HOUSE, GameConstants.TIME_OUT);
             this.eventManager.addEvent(promptHouseEvent);
-            //TODO finish turn in want to buy, dont want to buy or player resign
+            this.internalEventList.add(new InternalEvent(EventTypes.START_TIMER));
+
         } else {
             internalEventList.add(new InternalEvent(EventTypes.TURN_FINISHED));
         }
@@ -519,7 +544,7 @@ public class GameEngine {
     }
 
     private void payFine(Player payer, Player owner, int theFine) {
-        if (!owner.isBankrupt()) {
+        if (!owner.isBankruptOrRetired()) {
             if (payer.getMoney() < theFine) {
                 theFine = payer.getMoney();
                 this.setPlayerOutOfTheGame(payer);
@@ -548,6 +573,7 @@ public class GameEngine {
             promptAssetEvent = this.eventInitiator(0, infoString, this.currentPlayer.getPlayerName(), 0, 0, false,
                     0, false, null, 0, EventType.PROPMT_PLAYER_TO_BY_ASSET, GameConstants.TIME_OUT);
             this.eventManager.addEvent(promptAssetEvent);
+            this.internalEventList.add(new InternalEvent(EventTypes.START_TIMER));
         } else {
             internalEventList.add(new InternalEvent(EventTypes.TURN_FINISHED));
         }
@@ -596,6 +622,7 @@ public class GameEngine {
             promptAssetEvent = this.eventInitiator(0, infoString, this.currentPlayer.getPlayerName(), 0, 0, false,
                     0, false, null, 0, EventType.PROPMT_PLAYER_TO_BY_ASSET, GameConstants.TIME_OUT);
             this.eventManager.addEvent(promptAssetEvent);
+            this.internalEventList.add(new InternalEvent(EventTypes.START_TIMER));
         } else {
             internalEventList.add(new InternalEvent(EventTypes.TURN_FINISHED));
         }
@@ -614,6 +641,7 @@ public class GameEngine {
             promptAssetEvent = this.eventInitiator(0, infoString, this.currentPlayer.getPlayerName(), 0, 0, false,
                     0, false, null, 0, EventType.PROPMT_PLAYER_TO_BY_ASSET, GameConstants.TIME_OUT);
             this.eventManager.addEvent(promptAssetEvent);
+            this.internalEventList.add(new InternalEvent(EventTypes.START_TIMER));
 
         } else {
             internalEventList.add(new InternalEvent(EventTypes.TURN_FINISHED));
@@ -647,7 +675,7 @@ public class GameEngine {
 
     public void takeMoneyFromPlayers(Player getter, int sum) {
         for (Player payer : this.playerManager.getPlayers()) {
-            if (!(payer.isBankrupt())) {
+            if (!(payer.isBankruptOrRetired())) {
                 this.payFine(payer, getter, sum);
             }
         }
@@ -666,7 +694,7 @@ public class GameEngine {
 
     private void payFineToEveryPlayer(Player payer, int sum) {
         for (Player getter : this.playerManager.getPlayers()) {
-            if (!(payer.isBankrupt())) {
+            if (!(payer.isBankruptOrRetired())) {
                 this.payFine(payer, getter, sum);
             }
         }
@@ -714,8 +742,12 @@ public class GameEngine {
 
     }
 
-    void addEventToInternal(String event) {
+    public void addEventToInternal(String event) {
         this.internalEventList.add(new InternalEvent(event));
+    }
+
+    public void setPlayerManager(PlayersManager playersManager) {
+        this.playerManager = playersManager;
     }
 
 }

@@ -12,7 +12,7 @@ import ws.monopoly.PlayerDetails;
 public interface Player {
 	public void setPosition(int position);
 	public boolean canPlay();
-	public boolean isBankrupt();
+	public boolean isBankruptOrRetired();
 	public boolean isInJail();
 	public void setInJail(boolean val);
 	public boolean isParked();

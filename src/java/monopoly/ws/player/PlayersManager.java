@@ -15,6 +15,7 @@ import monopoly.ws.player.exceptions.NoHumanPlayerException;
 import monopoly.ws.player.exceptions.NullPictureException;
 import monopoly.ws.utility.EventTypes;
 import monopoly.ws.utility.GameConstants;
+import ws.monopoly.PlayerStatus;
 
 public class PlayersManager {
 
@@ -51,7 +52,7 @@ public class PlayersManager {
             newPlayer.setGame(game);
             playersModel.addPlayer(newPlayer);
         }
-        
+
         return newPlayerData;
     }
 
@@ -59,12 +60,10 @@ public class PlayersManager {
         return this.currentPlayer;
     }
 
-    public void nextPlayer() {
+    public synchronized void nextPlayer() {
         this.currentPlayer++;
         this.currentPlayer %= this.getPlayers().size();
-		Platform.runLater(()->{
-			this.game.addEventToEngine(EventTypes.PLAY_TURN);
-		});
+        this.game.addEventToEngine(EventTypes.PLAY_TURN);
 
     }
 
@@ -76,7 +75,7 @@ public class PlayersManager {
 
     public void createPCPlayers(MonopolyGame game) {
         for (int i = 0; i < this.pcPlayers; ++i) {
-            this.addPlayer(GameConstants.PC_PLAYER_NAME+"_"+i, false, "PC", null, null, game);
+            this.addPlayer(GameConstants.PC_PLAYER_NAME + "_" + i, false, "PC", null, null, game);
         }
     }
 
@@ -105,18 +104,19 @@ public class PlayersManager {
     public int howManyActivePlayers() {
         int counter = 0;
         for (Player player : this.playersModel.getPlayers()) {
-            if (!player.isBankrupt()) {
+            if (!player.isBankruptOrRetired()) {
                 counter++;
             }
         }
         return counter;
     }
-    
-    public Player getWinnerPlayer(){
+
+    public Player getWinnerPlayer() {
         Player winnerPlayer = null;
-        for (Player player : this.getPlayers()){
-            if (!player.isBankrupt())
+        for (Player player : this.getPlayers()) {
+            if (!player.isBankruptOrRetired()) {
                 winnerPlayer = player;
+            }
         }
         return winnerPlayer;
     }

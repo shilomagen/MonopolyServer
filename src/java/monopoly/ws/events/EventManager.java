@@ -16,19 +16,21 @@ import ws.monopoly.InvalidParameters_Exception;
  */
 public class EventManager {
     private EventModel eventModel;
-    private static int eventID=0;
+    private int eventID;
     
     public EventManager(){
         this.eventModel = new EventModel();
+        this.eventID = 0;
     }
     
     public List<Event> getEventListFromEventID(int id){
         return this.eventModel.getEventFromEventID(id);
+        
     }
 
     public void addEvent(Event event) {
         event.setId(eventID);
-        incrementEventID();
+        this.incrementEventID();
         this.eventModel.addEvent(event);
     }
 

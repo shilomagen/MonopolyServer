@@ -35,5 +35,8 @@ public final class EventTypes {
     public static final String PLAYER_DIDNT_WANT_TO_USE_CARD = "PlayerDidntWantToUseCard";
     public static final String PASSED_START_CELL = "Passed start cell";
     public static final String PLAYER_RESIGN = "Player resigned!";
+    public static final String KILL_TIMER = "Timer Killed";
+    public static final String START_TIMER= "Start Timer";
+    
 
 }

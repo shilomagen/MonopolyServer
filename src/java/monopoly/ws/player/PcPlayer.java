@@ -47,11 +47,11 @@ public class PcPlayer implements Player {
     }
     
     public boolean canPlay() {
-        return this.isInJail && this.isBankrupt() && this.isParked;
+        return this.isInJail && this.isBankruptOrRetired() && this.isParked;
     }
     
-    public boolean isBankrupt() {
-        return bankrupt;
+    public boolean isBankruptOrRetired() {
+        return this.bankrupt || this.playerDetails.getStatus() == PlayerStatus.RETIRED;
     }
     
     public boolean isInJail() {

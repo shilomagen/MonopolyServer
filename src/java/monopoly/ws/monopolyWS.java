@@ -115,16 +115,18 @@ public class monopolyWS {
     public void buy(int arg0, int arg1, boolean arg2) throws ws.monopoly.InvalidParameters_Exception {
         Player player = this.gameManager.getPlayerById(arg0);
         Event event = player.getGame().getEventManager().getEventById(arg1);
-        
+        MonopolyGame game = player.getGame();
+        game.addEventToEngine(EventTypes.KILL_TIMER);
         if (arg2){
             if (event.getType()==EventType.PROPMPT_PLAYER_TO_BY_HOUSE){
-                player.getGame().addEventToEngine(EventTypes.PLAYER_WANTS_TO_BUY_HOUSE);
+                game.addEventToEngine(EventTypes.PLAYER_WANTS_TO_BUY_HOUSE);
             }else {
-                player.getGame().addEventToEngine(EventTypes.PLAYER_WANTS_TO_BUY_BUYABLE);
+                game.addEventToEngine(EventTypes.PLAYER_WANTS_TO_BUY_BUYABLE);
             }
         } else{
-            player.getGame().addEventToEngine(EventTypes.PLAYER_DIDNT_WANT_TO_BUY);
+            game.addEventToEngine(EventTypes.PLAYER_DIDNT_WANT_TO_BUY);
         }
+        
         
         
         

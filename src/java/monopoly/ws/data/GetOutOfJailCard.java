@@ -16,7 +16,6 @@ public class GetOutOfJailCard extends Card {
 
     @Override
     public void surpriseAction(Player currentPlayer) {
-
         currentPlayer.getGame().addEventToEngine(EventTypes.GET_OUT_OF_JAIL_CARD);
     }
 
