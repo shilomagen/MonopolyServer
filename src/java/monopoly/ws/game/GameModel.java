@@ -29,7 +29,8 @@ public class GameModel {
     }
     
     public void addGame(MonopolyGame gameToAdd){
-        this.getGameModel().add(gameToAdd);
+        this.gameModel.add(gameToAdd);
+        System.out.println("Game " + gameToAdd.getGameName() + " successfully created on server");
     }
 
     /**

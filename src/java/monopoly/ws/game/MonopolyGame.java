@@ -80,6 +80,7 @@ public class MonopolyGame {
         if (this.gameDetails.getStatus() == GameStatus.WAITING) {
             PlayerData playerData = this.playersManager.addPlayer(playerName, true, "Male", null, null, this);
             this.gameDetails.setJoinedHumanPlayers(this.gameDetails.getJoinedHumanPlayers() + 1);
+            System.out.println("Player "+ playerName +" Added to game successfully");
             if (this.gameDetails.getHumanPlayers() == this.gameDetails.getJoinedHumanPlayers()) {
                 this.gameDetails.setStatus(GameStatus.ACTIVE);
             }

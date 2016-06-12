@@ -169,7 +169,7 @@ public class monopolyWS {
         } catch (IOException ex) {
             System.out.println("Couldnt open file");
         }
-        System.out.println(fileString);
+        
         return fileString;
     }
 
