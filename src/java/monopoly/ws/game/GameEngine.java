@@ -410,7 +410,6 @@ public class GameEngine {
             }
             case EventTypes.KILL_TIMER:
                 this.timer.cancel();
-                this.eventTimer.cancel();
                 break;
             case EventTypes.RETURN_CARD_TO_SURPRISE_DECK: {
                 this.returnSurpriseCardToDeck();
