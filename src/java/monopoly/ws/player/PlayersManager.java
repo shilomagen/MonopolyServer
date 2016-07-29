@@ -79,6 +79,13 @@ public class PlayersManager {
         }
     }
 
+    public void setPlayersToActive() {
+        Collection<Player> players = playersModel.getPlayers();
+        for (Player player : players) {
+            player.getPlayerDetails().setStatus(PlayerStatus.ACTIVE);
+        }
+    }
+
     static class PlayerComparator implements Comparator<Player> {
 
         @Override

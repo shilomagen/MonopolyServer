@@ -170,4 +170,8 @@ public class MonopolyGame {
         this.gameDetails.setStatus(GameStatus.FINISHED);
     }
 
+    public void setPlayersToActive() {
+        this.playersManager.setPlayersToActive();
+    }
+
 }

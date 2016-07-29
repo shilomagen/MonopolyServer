@@ -56,6 +56,7 @@ import monopoly.ws.utility.PairOfDice;
 import ws.monopoly.Event;
 import ws.monopoly.EventType;
 import ws.monopoly.PlayerStatus;
+import ws.monopoly.PlayerType;
 
 /**
  *
@@ -118,7 +119,7 @@ public class GameEngine {
                             0, 0, false, 0, false, null, 0, EventType.GAME_WINNER, 0);
                     this.eventManager.addEvent(winnerEvent);
                     this.game.shutdownGame();
-                    
+
                 } else if (!currentPlayer.isBankruptOrRetired()) {
                     if (currentPlayer.isParked()) {
                         Event parkedEvent;
@@ -474,12 +475,16 @@ public class GameEngine {
         boolean playerCouldBuyHouse = this.playerCouldBuyHouse(property);
         boolean playerNotHaveMaxHouses = property.getNumOfHouses() < 3;
         if (playerOwnCountry && playerCouldBuyHouse && playerNotHaveMaxHouses) {
-            String infoString = property.getName() + "_" + property.getData().getHouseCost();
-            Event promptHouseEvent;
-            promptHouseEvent = this.eventInitiator(0, infoString, this.currentPlayer.getPlayerName(), 0, 0, false,
-                    0, false, null, 0, EventType.PROPMPT_PLAYER_TO_BY_HOUSE, GameConstants.TIME_OUT);
-            this.eventManager.addEvent(promptHouseEvent);
-            this.internalEventList.add(new InternalEvent(EventTypes.START_TIMER));
+            if (currentPlayer.getPlayerDetails().getType().equals(PlayerType.HUMAN)) {
+                String infoString = property.getName() + "_" + property.getData().getHouseCost();
+                Event promptHouseEvent;
+                promptHouseEvent = this.eventInitiator(0, infoString, this.currentPlayer.getPlayerName(), 0, 0, false,
+                        0, false, null, 0, EventType.PROPMPT_PLAYER_TO_BY_HOUSE, GameConstants.TIME_OUT);
+                this.eventManager.addEvent(promptHouseEvent);
+                this.internalEventList.add(new InternalEvent(EventTypes.START_TIMER));
+            } else {
+                this.internalEventList.add(new InternalEvent(EventTypes.PLAYER_WANTS_TO_BUY_HOUSE));
+            }
 
         } else {
             internalEventList.add(new InternalEvent(EventTypes.TURN_FINISHED));
@@ -567,12 +572,16 @@ public class GameEngine {
     private void buyPropertyProcedure(Player currentPlayer, PropertyCell theCell) {
         boolean playerCouldBuy = theCell.getData().getCost() <= currentPlayer.getMoney();
         if (playerCouldBuy) {
-            String infoString = "City_" + theCell.getName() + "_" + theCell.getData().getCost();
-            Event promptAssetEvent;
-            promptAssetEvent = this.eventInitiator(0, infoString, this.currentPlayer.getPlayerName(), 0, 0, false,
-                    0, false, null, 0, EventType.PROPMT_PLAYER_TO_BY_ASSET, GameConstants.TIME_OUT);
-            this.eventManager.addEvent(promptAssetEvent);
-            this.internalEventList.add(new InternalEvent(EventTypes.START_TIMER));
+            if (currentPlayer.getPlayerDetails().getType().equals(PlayerType.HUMAN)) {
+                String infoString = "City_" + theCell.getName() + "_" + theCell.getData().getCost();
+                Event promptAssetEvent;
+                promptAssetEvent = this.eventInitiator(0, infoString, this.currentPlayer.getPlayerName(), 0, 0, false,
+                        0, false, null, 0, EventType.PROPMT_PLAYER_TO_BY_ASSET, GameConstants.TIME_OUT);
+                this.eventManager.addEvent(promptAssetEvent);
+                this.internalEventList.add(new InternalEvent(EventTypes.START_TIMER));
+            } else { //player is computer 
+                 this.internalEventList.add(new InternalEvent(EventTypes.PLAYER_WANTS_TO_BUY_BUYABLE));
+            }
         } else {
             internalEventList.add(new InternalEvent(EventTypes.TURN_FINISHED));
         }
@@ -616,12 +625,17 @@ public class GameEngine {
     private void buyTransportationProcedure(Player currentPlayer, TransportationCell theCell) {
         boolean playerCouldBuy = theCell.getData().getCost() <= currentPlayer.getMoney();
         if (playerCouldBuy) {
-            String infoString = "Transportation_" + theCell.getName() + "_" + theCell.getData().getCost();
-            Event promptAssetEvent;
-            promptAssetEvent = this.eventInitiator(0, infoString, this.currentPlayer.getPlayerName(), 0, 0, false,
-                    0, false, null, 0, EventType.PROPMT_PLAYER_TO_BY_ASSET, GameConstants.TIME_OUT);
-            this.eventManager.addEvent(promptAssetEvent);
-            this.internalEventList.add(new InternalEvent(EventTypes.START_TIMER));
+            if (currentPlayer.getPlayerDetails().getType().equals(PlayerType.HUMAN)) {
+                String infoString = "Transportation_" + theCell.getName() + "_" + theCell.getData().getCost();
+                Event promptAssetEvent;
+                promptAssetEvent = this.eventInitiator(0, infoString, this.currentPlayer.getPlayerName(), 0, 0, false,
+                        0, false, null, 0, EventType.PROPMT_PLAYER_TO_BY_ASSET, GameConstants.TIME_OUT);
+                this.eventManager.addEvent(promptAssetEvent);
+                this.internalEventList.add(new InternalEvent(EventTypes.START_TIMER));
+            } else {
+                this.internalEventList.add(new InternalEvent(EventTypes.PLAYER_WANTS_TO_BUY_BUYABLE));
+            }
+
         } else {
             internalEventList.add(new InternalEvent(EventTypes.TURN_FINISHED));
         }
@@ -635,13 +649,16 @@ public class GameEngine {
     private void buyUtilityProcedure(Player currentPlayer, UtilityCell theCell) {
         boolean playerCouldBuy = theCell.getData().getCost() <= currentPlayer.getMoney();
         if (playerCouldBuy) {
-            String infoString = "Utility_" + theCell.getName() + "_" + theCell.getData().getCost();
-            Event promptAssetEvent;
-            promptAssetEvent = this.eventInitiator(0, infoString, this.currentPlayer.getPlayerName(), 0, 0, false,
-                    0, false, null, 0, EventType.PROPMT_PLAYER_TO_BY_ASSET, GameConstants.TIME_OUT);
-            this.eventManager.addEvent(promptAssetEvent);
-            this.internalEventList.add(new InternalEvent(EventTypes.START_TIMER));
-
+            if (currentPlayer.getPlayerDetails().getType().equals(PlayerType.HUMAN)) {
+                String infoString = "Utility_" + theCell.getName() + "_" + theCell.getData().getCost();
+                Event promptAssetEvent;
+                promptAssetEvent = this.eventInitiator(0, infoString, this.currentPlayer.getPlayerName(), 0, 0, false,
+                        0, false, null, 0, EventType.PROPMT_PLAYER_TO_BY_ASSET, GameConstants.TIME_OUT);
+                this.eventManager.addEvent(promptAssetEvent);
+                this.internalEventList.add(new InternalEvent(EventTypes.START_TIMER));
+            } else {
+                this.internalEventList.add(new InternalEvent(EventTypes.PLAYER_WANTS_TO_BUY_BUYABLE));
+            }
         } else {
             internalEventList.add(new InternalEvent(EventTypes.TURN_FINISHED));
         }

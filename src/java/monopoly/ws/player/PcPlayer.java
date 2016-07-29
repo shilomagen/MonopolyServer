@@ -124,7 +124,6 @@ public class PcPlayer implements Player {
     
     @Override
     public void setIsBankrupt(boolean b) {
-        
         this.bankrupt = b;
         if (b) {
             this.playerDetails.setStatus(PlayerStatus.RETIRED);
@@ -228,5 +227,5 @@ public class PcPlayer implements Player {
     public void setGame(MonopolyGame playerGame) {
         this.playerGame = playerGame;
     }
-    
+
 }

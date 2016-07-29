@@ -147,6 +147,7 @@ public class monopolyWS {
     private void launchGame(String gameName) {
         try {
             MonopolyGame game = this.gameManager.getGameByGameName(gameName);
+            game.setPlayersToActive();
             Event startEvent = new Event();
             startEvent.setType(EventType.GAME_START);
             game.getEventManager().addEvent(startEvent);

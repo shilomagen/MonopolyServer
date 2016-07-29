@@ -43,4 +43,5 @@ public interface Player {
         public PlayerDetails getPlayerDetails();
         public MonopolyGame getGame();
         public void setGame(MonopolyGame playerGame);
+
 }
